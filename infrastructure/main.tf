@@ -21,7 +21,7 @@ resource "azurerm_windows_web_app" "webapp" {
     always_on = false
     application_stack {
       current_stack = "dotnet"
-      //version       = "10.0"
+      dotnet_version = "v8.0"
     }
   }
 }
