@@ -12,7 +12,7 @@ on:
   workflow_dispatch:  # Allows manual trigger
 
 env:
-  DOTNET_VERSION: '10.0.x'
+  DOTNET_VERSION: '8.0.x'
   AZURE_WEBAPP_NAME: 'webapp781929'
   AZURE_WEBAPP_PACKAGE_PATH: 'application/webapp'
   TERRAFORM_WORKING_DIR: 'infrastructure'
@@ -46,11 +46,6 @@ jobs:
     - name: Terraform Init
       id: init
       run: terraform init
-      env:
-        ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-        ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-        ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-        ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
     
     - name: Terraform Validate
       id: validate
@@ -61,11 +56,6 @@ jobs:
       if: github.event_name == 'pull_request'
       run: terraform plan -no-color -input=false
       continue-on-error: true
-      env:
-        ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-        ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-        ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-        ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
     
     - name: Terraform Plan Status
       if: steps.plan.outcome == 'failure'
@@ -74,11 +64,6 @@ jobs:
     - name: Terraform Apply
       if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
       run: terraform apply -auto-approve -input=false
-      env:
-        ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-        ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-        ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-        ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
 
   # Job 2: Build and Deploy .NET Application
   build-and-deploy:
@@ -111,13 +96,7 @@ jobs:
     - name: Login to Azure
       uses: azure/login@v2
       with:
-        creds: |
-          {
-            "clientId": "${{ secrets.AZURE_CLIENT_ID }}",
-            "clientSecret": "${{ secrets.AZURE_CLIENT_SECRET }}",
-            "subscriptionId": "${{ secrets.AZURE_SUBSCRIPTION_ID }}",
-            "tenantId": "${{ secrets.AZURE_TENANT_ID }}"
-          }
+        creds: '{"clientId":"4100c47e-4d39-4cd6-9af9-8ce7c5e5142d","clientSecret":"G0J8Q~EX9URj2~AKeNImRjh-arz7muTTvigBCduh","subscriptionId":"2ab4f266-3113-46c7-9a11-16bcb8ae5659","tenantId":"8cddfc2a-1f62-42be-a522-8ae3ca2fc894"}'
     
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v3
